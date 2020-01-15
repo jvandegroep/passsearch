@@ -137,11 +137,8 @@ function checkJob(id) {
 function timeConversion(millisec) {
 
   var seconds = (millisec / 1000).toFixed(1);
-
   var minutes = (millisec / (1000 * 60)).toFixed(1);
-
   var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
-
   var days = (millisec / (1000 * 60 * 60 * 24)).toFixed(1);
 
   if (seconds < 60) {
@@ -167,6 +164,13 @@ $(document).ready(function() {
 
     console.log('searching..');
     getInput();    
+  });
+
+  $('#inputPassword').keypress(function(e){
+    if(e.keyCode==13) {
+      $('#searchButton').click();
+      console.log('enter hit!')
+    }
   });
 
 });
