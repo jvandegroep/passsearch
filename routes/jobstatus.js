@@ -15,14 +15,13 @@ router.get('/', function(req, res) {
   //log request
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   console.log('original URL:', fullUrl);
-  console.log('query:',req.query);
 
   //check id value
   let id = req.query.id;
 
   if (id == '') {
 
-    //if false
+    //if id is not found
     res.status(412).send('not a valid id sent');
   }
   else {
@@ -40,9 +39,9 @@ router.get('/', function(req, res) {
       keys_only: false,
       each_callback: function (type, key, subkey, length, value, cb) {
           
+          //add key and value to object
           arr[subkey] = value
 
-          //console.log(arr);
           cb();
       },
       done_callback: function (err) {
@@ -51,7 +50,7 @@ router.get('/', function(req, res) {
           res.status(200).send(arr);
       }
     });
-  
+
   }
   
 

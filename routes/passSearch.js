@@ -27,21 +27,23 @@ hashQueue.process(function(job, done){
     let i = 0;
 
     let s = fs
-      .createReadStream('V:/temp/pwnedSha1Passes.txt')
+      .createReadStream('D:/temp/pwnedSha1Passes.txt')
       .pipe(es.split())
       .pipe(
         es
           .mapSync(function(line) {
 
+            //linehex is the hash on the file line
             linehex = (line.split(':'))[0];
-            //console.log('lijn ' + i + ' value: ' + valhex)
 
+            //compare the input hash with the hash on the file hash
             if (linehex == jobhex) {
 
               console.log('Hash found on line: ', i)
               done(null, { status: 'Hash found on line: ' + String(i) });
             }
 
+            //go to next line
             i++
           })
 
@@ -57,44 +59,29 @@ hashQueue.process(function(job, done){
 /* GET passSearch page */
 router.get('/', async function(req, res) {
 
-  // let res2 = null;
-  // res2 = res;
-
   //console logging
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   console.log('original URL:', fullUrl);
-  console.log('query:',req.query);
 
   let hash = req.query.hash;
 
   //check input
   if (hash == ""){
-    res.send('Error: (part of) input query empty');
-    return;
+    res.status(412).send('Error: (part of) input query empty');
   }
 
   else {
 
-    console.log('hash: ', hash);
+    //add job to queue
     hashQueue.add({'hash': hash})
     .then(function(job){
+
+      //get response from adding queue and send back including id
       console.log(`job ${job.id} added to queue`);
-      res.send(JSON.stringify(job))
+      res.status(200).send(JSON.stringify(job))
     })
 
   }
 });
-
-// function waitForActiveEvent(){
-
-//   hashQueue.on('global:active', function(job, jobPromise) {
-
-//     console.log(`Job with id ${job} has started. Status: ${jobPromise}`)
-
-//     return()
-           
-//   });
-
-// }
 
 module.exports = router;
