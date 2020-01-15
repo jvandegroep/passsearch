@@ -1,0 +1,25 @@
+
+body {
+  font-family: "-apple-system","system-ui","BlinkMacSystemFont","Segoe UI","Roboto","Helvetica Neue","Arial","sans-serif";
+}
+
+td {
+  padding: 5px;
+}
+
+.jumbotron-fluid {
+  padding-left: 15px;
+}
+
+.charInput {
+  text-align: center !important;
+  width: 30px !important;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+  font-size: x-large !important;
+  text-transform:uppercase !important;
+}
+
+#outputDiv {
+  display: none;
+}

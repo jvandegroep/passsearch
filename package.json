@@ -1,0 +1,23 @@
+{
+  "name": "passsearch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bull": "^3.12.1",
+    "event-stream": "^4.0.1",
+    "express": "^4.17.1",
+    "node-redis-scan": "^1.1.1",
+    "redis": "^2.8.0",
+    "redisscan": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www"
+  }
+}
