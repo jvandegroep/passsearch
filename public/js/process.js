@@ -4,10 +4,21 @@ function getInput(){
   //get input from field
   let input = document.getElementById('inputPassword').value;
 
-  let encrypted = CryptoJS.SHA1(input);
-  let hash = (CryptoJS.enc.Hex.stringify(encrypted)).toUpperCase();
+  if (input !== "") {
 
-  sendInput(hash);
+    document.getElementById('inputPassword').value = "";
+
+    //hash input value
+    let encrypted = CryptoJS.SHA1(input);
+    let hash = (CryptoJS.enc.Hex.stringify(encrypted)).toUpperCase();
+
+    sendInput(hash);
+  }
+  else {
+
+    alert('no input received')
+  }
+  
 }
 
 
@@ -43,90 +54,26 @@ function checkJob(id) {
       return response.json();
     })
     .then(result => {
+
+      //if response
       if (result !== '') {
 
         let hash = JSON.parse(result.data).hash;
         let beginOn = new Date(parseInt(result.timestamp)).toLocaleTimeString();
         let now = new Date().getTime();
-        let duration = timeConversion(now - parseInt(result.timestamp));
+        let duration = result.finishedOn ? timeConversion(parseInt(result.finishedOn) - parseInt(result.timestamp)) : timeConversion(now - parseInt(result.timestamp));
+        let finishedOn = result.finishedOn ? new Date(parseInt(result.finishedOn)).toLocaleTimeString() : "";
+        let status = result.finishedOn ? "completed" : "running";
+        let rowFound = result.returnvalue ? (JSON.parse(result.returnvalue).status).substr(20, JSON.parse(result.returnvalue).status.length) : "";
+        
+        console.log(`job status of id ${id}: ${result.returnvalue}`)
 
-        console.log(`job status of id ${id}: ${result.timestamp}`)
-
-        //add job data to table if not existing
-        let row = $(`#outputTable tbody > tr > th:contains(${id})`);
-        if ( row.length == 0 ) {
-
-          console.log(`append data to table`)
-          $("#outputTable > tbody:last-child").append(`
-          <tr>
-            <th scope="row">${id}</th>
-            <td>${hash}</td>
-            <td>${beginOn}</td>
-            <td></td>
-            <td>${duration}}</td>
-            <td></td>
-            <td>running</td>
-          </tr>`)
-        } else {
-
-          console.log(`Job stil running, updating row ${row[0].parentNode.rowIndex}`)
-          
-          //remove existing table row
-          $(`#outputTable tbody > tr:eq(${(row[0].parentNode.rowIndex) -1})`).remove();
-          
-          //append new row with new duration
-          $("#outputTable > tbody:last-child").append(`
-          <tr>
-            <th scope="row">${id}</th>
-            <td>${hash}</td>
-            <td>${beginOn}</td>
-            <td></td>
-            <td>${duration}</td>
-            <td></td>
-            <td>running</td>
-          </tr>`)
-        }
-
-
-        //check if job is finished
-        if (typeof result.finishedOn === 'undefined'){
-
-          //rerun job
-          console.log(`job not ready yet, rerunning..`)
-          setTimeout(() => {
-
-            checkJob(id);
-          },3000)
-        }
-        else {
-
-          console.log(`job finished, status: ${result.finishedOn}`);
-
-          row = $(`#outputTable tbody > tr > th:contains(${id})`);
-
-          let finishedOn = new Date(parseInt(result.finishedOn)).toLocaleTimeString();
-          let status = JSON.parse(result.returnvalue).status;
-          duration = timeConversion(parseInt(result.finishedOn) - parseInt(result.timestamp));
-
-          //remove existing table row
-          $(`#outputTable tbody > tr:eq(${(row[0].parentNode.rowIndex) -1})`).remove();
-          
-          //append new row with full data
-          $("#outputTable > tbody:last-child").append(`
-          <tr>
-            <th scope="row">${id}</th>
-            <td>${hash}</td>
-            <td>${beginOn}</td>
-            <td>${finishedOn}</td>
-            <td>${duration}</td>
-            <td>${status.substr(20, status.length)}</td>
-            <td>completed</td>
-          </tr>`)
-          
-          
-        }
+        //add job data to table
+        appendToTable("outputTable", id, hash, beginOn, finishedOn, duration, rowFound, status);
       }
+      //if no response
       else {
+
         console.log(`no data received for job id ${id}`)
       }
     })
@@ -152,7 +99,70 @@ function timeConversion(millisec) {
   }
 }
 
+function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFound, status) {
 
+  //set row
+  let content = `
+    <tr>
+      <th scope="row">${id}</th>
+      <td>${hash}</td>
+      <td>${beginOn}</td>
+      <td>${finishedOn}</td>
+      <td>${duration}}</td>
+      <td>${rowFound}</td>
+      <td>${status}</td>
+      <td>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-secondary"></button>
+          <button type="button" class="btn btn-secondary"></button>
+          <button type="button" class="btn btn-secondary"></button>
+        </div>
+      </td>
+    </tr>`
+
+  //find row index
+  let row = $(`#${tableName} > tbody > tr > th:contains(${id})`);
+
+  if (row.length > 0) {
+
+    //get row index number
+    let rowIndex = row[0].parentNode.rowIndex;
+
+    //existing row found
+    console.log(`Existing row found, index: ${rowIndex}`);
+
+    //remove existing row
+    $(`#${tableName} > tbody > tr`).eq(rowIndex -1).remove();
+
+    //append content to removed row
+    $(`#${tableName} > tbody > tr`).eq(rowIndex -2).after(content);
+
+  } else {
+
+    //no existing row found
+    console.log(`No existing row found`);
+
+    //append content to last row
+    $(`#${tableName} > tbody:last-child`).append(content)
+
+  }
+
+  //check if job is finished
+  if (finishedOn === ""){
+
+    //rerun job
+    console.log(`job not ready yet, rerunning..`)
+    setTimeout(() => {
+
+      checkJob(id);
+    },3000)
+  }
+  else {
+
+    console.log(`job finished, status: ${status}`)
+  }
+
+}
 
 
 
@@ -169,7 +179,6 @@ $(document).ready(function() {
   $('#inputPassword').keypress(function(e){
     if(e.keyCode==13) {
       $('#searchButton').click();
-      console.log('enter hit!')
     }
   });
 
