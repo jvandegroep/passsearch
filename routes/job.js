@@ -41,17 +41,22 @@ router.get('/failed', function(req, res) {
 });
 
 
-//API FOR PAUSING JOBS
-router.get('/pause', function(req, res) {
+//API FOR KILLING JOBS
+router.get('/kill', function(req, res) {
 
     //check id value
     let id = req.query.id;
 
     if (id) {
 
-      //pause a job
+      //kill a job
       hashQueue.getJob(id).then(job => {
-        console.log(`job ${job.id} - job is to to be paused`);
+        console.log(`job ${job.id} - job is to to be killed`);
+
+        job.update({hash: job.data.hash ,kill: 'yes'})
+        .then(response => {
+          console.log(`job ${job.id} - job updated: ${response}`)
+        });
 
         job.getState().then(result => {
 

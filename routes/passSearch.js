@@ -30,7 +30,7 @@ hashQueue.process(function(job, done){
             //compare the input hash with the hash on the file hash
             if (linehex == jobhex) {
 
-              console.log(`job ${job.id} - Hash found on line: ${i}`)
+              console.log(`processor - job ${job.id} - Hash found on line: ${i}`)
               done(null, { status: 'Hash found on line: ' + String(i) });
             } 
             
@@ -41,16 +41,23 @@ hashQueue.process(function(job, done){
               j++
 
               //update progress every x cycles
-              if (j >= 10000) {
+              if (j >= 100000) {
                 job.progress({"perc":((i / 555270000) * 100).toFixed(2), "lines": i});
                 j = 0;
+
+                //check if job is killed
+                if (job.data.kill === 'yes') {
+                  console.log(`processor - job ${job.id} - Job has been killed`)
+                  done(null, { status: 'job has been killed'});
+                }
+
               }
             }
           })
 
           .on('end', function(){
 
-            console.log('nothing found!')
+            console.log('processor - nothing found!')
             done(null, { status:'Nothing found! searched: ' + String(i) });
           })
       )
