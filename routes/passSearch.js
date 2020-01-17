@@ -11,20 +11,18 @@ let redisClient = redis.createClient({
   host: '192.168.178.131'
 });
 
-// create queue
+// create job queue
 let hashQueue = new Queue('hash checking', {redis: {port: 6379, host: '192.168.178.131'}});
 
-// create task
+// create job processer
 hashQueue.process(function(job, done){
 
-    // do job and report progress
-    job.progress(42);
-
-    console.log('job started! with data: ', JSON.stringify(job));
+    console.log(`job ${job.id} - started with data: ${JSON.stringify(job)}`);
 
     let jobhex = job.data.hash;
     let linehex;
     let i = 0;
+    let j = 0;
 
     let s = fs
       .createReadStream('V:/temp/pwnedSha1Passes.txt')
@@ -39,12 +37,22 @@ hashQueue.process(function(job, done){
             //compare the input hash with the hash on the file hash
             if (linehex == jobhex) {
 
-              console.log('Hash found on line: ', i)
+              console.log(`job ${job.id} - Hash found on line: ${i}`)
               done(null, { status: 'Hash found on line: ' + String(i) });
-            }
+            } 
+            
+            else {
 
-            //go to next line
-            i++
+              //go to next line
+              i++
+              j++
+
+              //update progress every x cycles
+              if (j >= 10000) {
+                job.progress({"perc":((i / 500000000) * 100).toFixed(2), "lines": i});
+                j = 0;
+              }
+            }
           })
 
           .on('end', function(){
@@ -61,7 +69,7 @@ router.get('/', async function(req, res) {
 
   //console logging
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  console.log('original URL:', fullUrl);
+  console.log(`passsearch URL: ${fullUrl}`);
 
   let hash = req.query.hash;
 
@@ -77,7 +85,7 @@ router.get('/', async function(req, res) {
     .then(function(job){
 
       //get response from adding queue and send back including id
-      console.log(`job ${job.id} added to queue`);
+      console.log(`job ${job.id} - added job to queue`);
       res.status(200).send(JSON.stringify(job))
     })
 

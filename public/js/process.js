@@ -63,9 +63,10 @@ function checkJob(id) {
         let finishedOn = result.finishedOn ? new Date(parseInt(result.finishedOn)).toLocaleTimeString() : "";
         let status = result.finishedOn ? "completed" : "running";
         let rowFound = result.returnvalue ? (JSON.parse(result.returnvalue).status).substr(20, JSON.parse(result.returnvalue).status.length) : "";
+        let progress = result.progress ? JSON.parse(result.progress).perc : "";
 
         //add job data to table
-        appendToTable("outputTable", id, hash, beginOn, finishedOn, duration, rowFound, status);
+        appendToTable("outputTable", id, hash, beginOn, finishedOn, duration, rowFound, status, progress);
       }
       //if no response
       else {
@@ -95,7 +96,20 @@ function timeConversion(millisec) {
   }
 }
 
-function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFound, status) {
+function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFound, status, progress) {
+
+  //progressbar
+  if (!rowFound) {
+
+    let progressInt = parseInt(progress);
+    let progressFloat = parseFloat(progress);
+
+    rowFound = `
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: ${progressInt}%;" aria-valuenow="${progressInt}" aria-valuemin="0" aria-valuemax="100">${progressFloat}%</div>
+    </div>
+    `
+  }
 
   //set row
   let content = `

@@ -14,7 +14,7 @@ router.get('/status', function(req, res) {
 
   //log request
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  console.log('original URL:', fullUrl);
+  console.log('job status URL:', fullUrl);
 
   //check id value
   let id = req.query.id;
@@ -22,14 +22,14 @@ router.get('/status', function(req, res) {
   if (id == '') {
 
     //if id is not found
-    res.status(412).send('not a valid id sent');
+    res.status(412).send(`not a valid id sent`);
   }
   else {
 
     //if true
     let key = 'bull:hash checking:' + id;
 
-    console.log(`id: ${id} \n key: ${key}`);
+    console.log(`job ${id} - key: ${key}`);
 
     let arr ={};
 
@@ -45,7 +45,7 @@ router.get('/status', function(req, res) {
           cb();
       },
       done_callback: function (err) {
-          console.log(arr);
+          console.log(`job ${id} - redit response: ${JSON.stringify(arr)}`);
 
           res.status(200).send(arr);
       }

@@ -23,3 +23,7 @@ td {
 #outputDiv {
   display: none;
 }
+
+#outputTable {
+  font-size: 8pt;
+}
