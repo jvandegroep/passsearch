@@ -54,16 +54,16 @@ function checkJob(id) {
     .then(result => {
 
       //if response
-      if (result !== '') {
+      if (result) {
 
-        let hash = JSON.parse(result.data).hash;
-        let beginOn = new Date(parseInt(result.timestamp)).toLocaleTimeString();
+        let hash = result.data.hash;
+        let beginOn = new Date(result.timestamp).toLocaleTimeString();
         let now = new Date().getTime();
-        let duration = result.finishedOn ? timeConversion(parseInt(result.finishedOn) - parseInt(result.timestamp)) : timeConversion(now - parseInt(result.timestamp));
-        let finishedOn = result.finishedOn ? new Date(parseInt(result.finishedOn)).toLocaleTimeString() : "";
+        let duration = result.finishedOn ? timeConversion(result.finishedOn - result.timestamp) : timeConversion(now - result.timestamp);
+        let finishedOn = result.finishedOn ? new Date(result.finishedOn).toLocaleTimeString() : "";
         let status = result.finishedOn ? "completed" : "running";
-        let rowFound = result.returnvalue ? (JSON.parse(result.returnvalue).status).substr(20, JSON.parse(result.returnvalue).status.length) : "";
-        let progress = result.progress ? JSON.parse(result.progress).perc : "";
+        let rowFound = result.returnvalue ? (result.returnvalue.status).substr(20, result.returnvalue.status.length) : "";
+        let progress = result.progress ? result.progress.perc : "";
 
         //add job data to table
         appendToTable("outputTable", id, hash, beginOn, finishedOn, duration, rowFound, status, progress);
@@ -98,6 +98,8 @@ function timeConversion(millisec) {
 
 function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFound, status, progress) {
 
+  let rowBtn = "";
+
   //progressbar
   if (!rowFound) {
 
@@ -111,6 +113,23 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
     `
   }
 
+  if (status != 'completed') {
+
+    rowBtn = `
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-secondary" id="btnPause"><img src="/img/pause.svg" alt="" width="12" height="12" title="Pause Job"></button>
+          <button type="button" class="btn btn-secondary" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
+        </div>
+    `
+  } else {
+
+    rowBtn = `
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-secondary" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
+        </div>
+    `
+  }
+
   //set row
   let content = `
     <tr>
@@ -121,13 +140,7 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
       <td>${duration}</td>
       <td>${rowFound}</td>
       <td>${status}</td>
-      <td>
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-secondary"></button>
-          <button type="button" class="btn btn-secondary"></button>
-          <button type="button" class="btn btn-secondary"></button>
-        </div>
-      </td>
+      <td id="btnTd">${rowBtn}</td>
     </tr>`
 
   //find row index

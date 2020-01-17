@@ -11,19 +11,22 @@ td {
   padding-left: 15px;
 }
 
-.charInput {
-  text-align: center !important;
-  width: 30px !important;
-  padding-left: 1px !important;
-  padding-right: 1px !important;
-  font-size: x-large !important;
-  text-transform:uppercase !important;
-}
-
 #outputDiv {
   display: none;
 }
 
 #outputTable {
   font-size: 8pt;
+}
+
+#btnPause {
+  padding: 0;
+}
+
+#btnRemove {
+  padding: 0;
+}
+
+#btnTd {
+  text-align: end;
 }

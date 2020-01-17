@@ -1,56 +1,72 @@
-let express = require('express');
-let router = express.Router();
-let redis = require("redis");
-let redisScan = require("redisscan");
+const express = require('express');
+const router = express.Router();
+const redis = require("redis");
+const Queue = require('bull');
 
-// setup redis client
-let redisClient = redis.createClient({
-  port: 6379,
-  host: '192.168.178.131'
-});
+//connect to queue
+const hashQueue = new Queue('hash checking', {redis: {port: 6379, host: '192.168.178.131'}});
 
-/* GET passSearch page */
+
+//API FOR STATUS
 router.get('/status', function(req, res) {
-
-  //log request
-  let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  console.log('job status URL:', fullUrl);
 
   //check id value
   let id = req.query.id;
 
-  if (id == '') {
+  if (id) {
+
+    //get job data
+    hashQueue.getJob(id).then(job => {
+
+      console.log(`job ${job.id} - status sent`);
+      res.status(200).send(job);
+    });
+  }
+  else {
 
     //if id is not found
     res.status(412).send(`not a valid id sent`);
   }
-  else {
-
-    //if true
-    let key = 'bull:hash checking:' + id;
-
-    console.log(`job ${id} - key: ${key}`);
-
-    let arr ={};
-
-    redisScan({
-      redis: redisClient,
-      pattern: key,
-      keys_only: false,
-      each_callback: function (type, key, subkey, length, value, cb) {
-          
-          //add key and value to object
-          arr[subkey] = value
-
-          cb();
-      },
-      done_callback: function (err) {
-          console.log(`job ${id} - redit response: ${JSON.stringify(arr)}`);
-
-          res.status(200).send(arr);
-      }
-    });
-  }
 });
+
+
+//API FOR FAILED JOBS
+router.get('/failed', function(req, res) {
+
+  //get failed job
+  hashQueue.getFailed().then(result => {
+    console.log(`getFailedjobs: ${result.length}`);
+    res.status(200).send(result)
+  });
+});
+
+
+//API FOR PAUSING JOBS
+router.get('/pause', function(req, res) {
+
+    //check id value
+    let id = req.query.id;
+
+    if (id) {
+
+      //pause a job
+      hashQueue.getJob(id).then(job => {
+        console.log(`job ${job.id} - job is to to be paused`);
+
+        job.getState().then(result => {
+
+          console.log(`job ${job.id} - job getState: ${result}`);
+          res.status(200).send(job);
+        });
+      });
+    
+    } else {
+
+      res.status(412).send(`not a valid id sent`);
+    }  
+});
+
+
+
 
 module.exports = router;

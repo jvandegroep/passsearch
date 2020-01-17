@@ -1,18 +1,11 @@
-let express = require('express');
-let router = express.Router();
-let fs = require('fs');
-let Queue = require('bull');
-let es = require('event-stream');
-let redis = require("redis");
-
-// setup redis client
-let redisClient = redis.createClient({
-  port: 6379,
-  host: '192.168.178.131'
-});
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const Queue = require('bull');
+const es = require('event-stream');
 
 // create job queue
-let hashQueue = new Queue('hash checking', {redis: {port: 6379, host: '192.168.178.131'}});
+const hashQueue = new Queue('hash checking', {redis: {port: 6379, host: '192.168.178.131'}});
 
 // create job processer
 hashQueue.process(function(job, done){
@@ -49,7 +42,7 @@ hashQueue.process(function(job, done){
 
               //update progress every x cycles
               if (j >= 10000) {
-                job.progress({"perc":((i / 500000000) * 100).toFixed(2), "lines": i});
+                job.progress({"perc":((i / 555270000) * 100).toFixed(2), "lines": i});
                 j = 0;
               }
             }
