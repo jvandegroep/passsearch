@@ -2,7 +2,7 @@ var express = require('express');
 
 var index = require('./routes/index');
 var passSearch = require('./routes/passSearch');
-var jobstatus = require('./routes/jobstatus');
+var job = require('./routes/job');
 
 var app = express();
 
@@ -15,7 +15,7 @@ app.use(express.static(__dirname + '/public'));
 
 // when url path includes /blah then go to blah route (./routes/blah)
 app.use('/passSearch', passSearch);
-app.use('/jobstatus', jobstatus);
+app.use('/job', job);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

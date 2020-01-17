@@ -27,7 +27,7 @@ hashQueue.process(function(job, done){
     let i = 0;
 
     let s = fs
-      .createReadStream('D:/temp/pwnedSha1Passes.txt')
+      .createReadStream('V:/temp/pwnedSha1Passes.txt')
       .pipe(es.split())
       .pipe(
         es

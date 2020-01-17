@@ -10,7 +10,7 @@ let redisClient = redis.createClient({
 });
 
 /* GET passSearch page */
-router.get('/', function(req, res) {
+router.get('/status', function(req, res) {
 
   //log request
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
@@ -50,10 +50,7 @@ router.get('/', function(req, res) {
           res.status(200).send(arr);
       }
     });
-
   }
-  
-
 });
 
 module.exports = router;

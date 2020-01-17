@@ -31,8 +31,6 @@ function sendInput(data) {
     })
     .then((result) => {
       if (result !== null) {
-      
-        console.log('api response: ',result);
 
         // show outputDiv
         document.getElementById('outputDiv').style.display = 'block';
@@ -41,7 +39,7 @@ function sendInput(data) {
         checkJob(result.id);
       }
       else {
-        console.log('no result from hash being send!')
+        console.log('no response received from api')
       }
     });
 }
@@ -49,7 +47,7 @@ function sendInput(data) {
 // check status of job
 function checkJob(id) {
 
-  fetch(window.location.href + "jobstatus?id=" + id)
+  fetch(window.location.href + "job/status?id=" + id)
     .then((response) => {
       return response.json();
     })
@@ -65,8 +63,6 @@ function checkJob(id) {
         let finishedOn = result.finishedOn ? new Date(parseInt(result.finishedOn)).toLocaleTimeString() : "";
         let status = result.finishedOn ? "completed" : "running";
         let rowFound = result.returnvalue ? (JSON.parse(result.returnvalue).status).substr(20, JSON.parse(result.returnvalue).status.length) : "";
-        
-        console.log(`job status of id ${id}: ${result.returnvalue}`)
 
         //add job data to table
         appendToTable("outputTable", id, hash, beginOn, finishedOn, duration, rowFound, status);
@@ -108,7 +104,7 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
       <td>${hash}</td>
       <td>${beginOn}</td>
       <td>${finishedOn}</td>
-      <td>${duration}}</td>
+      <td>${duration}</td>
       <td>${rowFound}</td>
       <td>${status}</td>
       <td>
@@ -123,24 +119,18 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
   //find row index
   let row = $(`#${tableName} > tbody > tr > th:contains(${id})`);
 
+  //existing row found
   if (row.length > 0) {
 
     //get row index number
     let rowIndex = row[0].parentNode.rowIndex;
 
-    //existing row found
-    console.log(`Existing row found, index: ${rowIndex}`);
-
-    //remove existing row
-    $(`#${tableName} > tbody > tr`).eq(rowIndex -1).remove();
-
-    //append content to removed row
-    $(`#${tableName} > tbody > tr`).eq(rowIndex -2).after(content);
+    //replace existing row
+    $(`#${tableName} > tbody > tr`).eq(rowIndex -1).replaceWith(content);
 
   } else {
 
     //no existing row found
-    console.log(`No existing row found`);
 
     //append content to last row
     $(`#${tableName} > tbody:last-child`).append(content)
@@ -151,7 +141,7 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
   if (finishedOn === ""){
 
     //rerun job
-    console.log(`job not ready yet, rerunning..`)
+    console.log(`job with id ${id} status: ${status}`)
     setTimeout(() => {
 
       checkJob(id);
@@ -159,7 +149,7 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
   }
   else {
 
-    console.log(`job finished, status: ${status}`)
+    console.log(`job with id ${id} status: ${status}`)
   }
 
 }
@@ -172,7 +162,6 @@ $(document).ready(function() {
   //do when button clicked
   $('#searchButton').click(function() {
 
-    console.log('searching..');
     getInput();    
   });
 
