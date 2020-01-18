@@ -18,7 +18,7 @@ hashQueue.process(function(job, done){
     let j = 0;
 
     let s = fs
-      .createReadStream('V:/temp/pwnedSha1Passes.txt')
+      .createReadStream('D:/temp/pwnedSha1Passes.txt')
       .pipe(es.split())
       .pipe(
         es
@@ -41,16 +41,18 @@ hashQueue.process(function(job, done){
               j++
 
               //update progress every x cycles
-              if (j >= 100000) {
+              if (j >= 1000000) {
                 job.progress({"perc":((i / 555270000) * 100).toFixed(2), "lines": i});
                 j = 0;
 
                 //check if job is killed
-                if (job.data.kill === 'yes') {
-                  console.log(`processor - job ${job.id} - Job has been killed`)
-                  done(null, { status: 'job has been killed'});
-                }
+                hashQueue.getJob(job.id).then(job2 => {
 
+                  if (job2.data.kill) {
+                    console.log(`Job ${job.id} - ${JSON.stringify(job2.data)}`)
+                    done(null, { status: `Job ${job.id} -  has been killed` });
+                  }
+                })
               }
             }
           })

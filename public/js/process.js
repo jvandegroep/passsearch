@@ -113,22 +113,11 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
     `
   }
 
-  if (status != 'completed') {
-
-    rowBtn = `
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-secondary" id="btnPause"><img src="/img/pause.svg" alt="" width="12" height="12" title="Pause Job"></button>
-          <button type="button" class="btn btn-secondary" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
-        </div>
-    `
-  } else {
-
-    rowBtn = `
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-secondary" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
-        </div>
-    `
-  }
+  rowBtn = `
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
+      </div>
+  `
 
   //set row
   let content = `
