@@ -115,7 +115,7 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
 
   rowBtn = `
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-secondary" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
+        <button type="button" class="btn btn-secondary" class="btnRemove" id="btnRemove"><img src="/img/trash.svg" alt="" width="12" height="12" title="Remove Job"></button>
       </div>
   `
 
@@ -167,7 +167,18 @@ function appendToTable(tableName, id, hash, beginOn, finishedOn, duration, rowFo
 
     console.log(`job with id ${id} status: ${status}`)
   }
+}
 
+
+function killJob(id){
+
+  fetch(window.location.href + "job/kill?id=" + id)
+    .then((response) => {
+      return response.json();
+    })
+    .then(result => {
+      console.log(`job ${id} - job killed`)
+    });
 }
 
 
@@ -181,10 +192,20 @@ $(document).ready(function() {
     getInput();    
   });
 
+  //check when enter is pressed
   $('#inputPassword').keypress(function(e){
     if(e.keyCode==13) {
       $('#searchButton').click();
     }
+  });
+
+  //kill job on trash button press
+  $(document).on(`click`, `#btnRemove`, function() {
+
+    let id = $(this).closest('tr')[0].cells[0].innerText;
+
+    killJob(id);
+
   });
 
 });
