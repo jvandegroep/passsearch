@@ -8,7 +8,7 @@
   "dependencies": {
     "bull": "^3.12.1",
     "event-stream": "^4.0.1",
-    "express": "^4.17.1"
+    "express": "^4.17.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
